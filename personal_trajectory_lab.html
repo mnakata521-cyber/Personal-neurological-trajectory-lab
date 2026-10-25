@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Personal Trajectory Lab</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--tx:#1b2430;--mu:#52606f;--bd:#cfd6de;--ac:#1f5fbf;--gn:#1a7f4b;--or:#b45309;--rd:#b42318;--gy:#6b7280;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12171d;--card:#1b232c;--tx:#e8edf2;--mu:#a9b4c0;--bd:#364250;--ac:#6ea8ff;--gn:#4cc38a;--or:#f0a35a;--rd:#ff8a80;--gy:#9aa5b1}}
+:root[data-theme="dark"]{--bg:#12171d;--card:#1b232c;--tx:#e8edf2;--mu:#a9b4c0;--bd:#364250;--ac:#6ea8ff;--gn:#4cc38a;--or:#f0a35a;--rd:#ff8a80;--gy:#9aa5b1}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header,main{max-width:980px;margin:0 auto;padding:12px 16px}
+h1{font-size:1.5rem;margin:.2em 0}h2{font-size:1.15rem}.sub{color:var(--mu);margin:0}
+.banner{background:var(--card);border:2px solid var(--or);border-radius:8px;padding:6px 12px;font-weight:600;margin:10px 0}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+nav button,.btn{font:inherit;padding:8px 14px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;cursor:pointer}
+nav button[aria-selected=true]{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+select,input[type=number]{font:inherit;padding:6px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:6px}
+input[type=range]{width:100%;max-width:520px}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;border:1px solid currentColor;font-weight:600;font-size:.9rem}
+.w{color:var(--or)}.r{color:var(--rd)}.g{color:var(--gn)}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid var(--bd);padding:6px 8px;text-align:left}
+svg text{fill:var(--tx);font-size:12px}textarea{width:100%;height:140px;background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.outc{margin:0;padding-left:1.1em}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) nav button[aria-selected=true]{color:#0b1220}}
+:root[data-theme="dark"] nav button[aria-selected=true]{color:#0b1220}
+</style></head><body>
+<header><h1>Personal Trajectory Lab</h1><p class="sub">When does a personal baseline help—and when does it mislead?</p>
+<div class="banner" role="note">Synthetic data. Experimental thresholds. Not clinical evidence.</div>
+<nav role="tablist" id="nav"></nav></header><main id="main"></main>
+<script id="core">
+const DATA={"Stable": [[1, 90.0], [2, 92.0], [3, 89.0], [4, 91.0], [5, 90.0], [6, 93.0], [7, 88.0], [8, 91.0], [9, 90.0], [10, 92.0], [11, 91.0], [12, 89.0], [13, 92.0], [14, 90.0], [15, 93.0], [16, 91.0], [17, 88.0], [18, 90.0], [19, 92.0], [20, 91.0], [21, 89.0], [22, 93.0], [23, 90.0], [24, 91.0], [25, 92.0], [26, 88.0], [27, 91.0], [28, 90.0], [29, 93.0], [30, 89.0]], "Gradual Change": [[1, 90.0], [2, 92.0], [3, 89.0], [4, 91.0], [5, 90.0], [6, 93.0], [7, 88.0], [8, 91.0], [9, 90.0], [10, 92.0], [11, 91.0], [12, 90.0], [13, 89.0], [14, 90.0], [15, 88.0], [16, 87.0], [17, 88.0], [18, 86.0], [19, 85.0], [20, 86.0], [21, 84.0], [22, 83.0], [23, 84.0], [24, 82.0], [25, 81.0], [26, 82.0], [27, 80.0], [28, 79.0], [29, 78.0], [30, 77.0]], "Temporary Dip": [[1, 90.0], [2, 92.0], [3, 89.0], [4, 91.0], [5, 90.0], [6, 93.0], [7, 88.0], [8, 91.0], [9, 90.0], [10, 92.0], [11, 91.0], [12, 89.0], [13, 92.0], [14, 90.0], [15, 93.0], [16, 91.0], [17, 90.0], [18, 80.0], [19, 79.0], [20, 90.0], [21, 92.0], [22, 89.0], [23, 91.0], [24, 93.0], [25, 90.0], [26, 88.0], [27, 92.0], [28, 91.0], [29, 89.0], [30, 90.0]]};
+const CUT=70;
+function validNum(v){return typeof v==='number'&&isFinite(v)}
+// Core: uses ONLY rows with session<=upto (no future leakage).
+function analyze(raw,k,N,upto){
+  const rows=raw.filter(r=>r[0]<=upto).slice().sort((a,b)=>a[0]-b[0]);
+  const m=new Map(rows.map(r=>[r[0],r[1]]));const warnings=[];
+  for(let s=1;s<=upto;s++){if(!m.has(s))warnings.push('Session '+s+' is missing.');else if(!validNum(m.get(s)))warnings.push('Session '+s+' has an invalid score.')}
+  const out={rows,warnings,baseline:null,sd:null,bound:null,degenerate:false,baselineReady:false,deps:{},flag:null,crossing:null,latest:null};
+  for(const [s,v] of rows){if(validNum(v)&&v<CUT&&out.crossing===null)out.crossing=s}
+  const last=rows.length?rows[rows.length-1]:null;out.latest=last;
+  if(upto>=10){
+    const b=[];for(let s=1;s<=10;s++){const v=m.get(s);if(validNum(v))b.push(v)}
+    if(b.length<10){warnings.push('Baseline incomplete (needs 10 valid scores in sessions 1–10); monitoring not run.');return out}
+    const mean=b.reduce((a,c)=>a+c,0)/10;
+    const sd=Math.sqrt(b.reduce((a,c)=>a+(c-mean)**2,0)/9); // sample SD (n-1)
+    out.baseline=mean;out.sd=sd;out.bound=mean-k*sd;out.baselineReady=true;
+    if(sd===0){out.degenerate=true;warnings.push('Degenerate baseline: standard deviation is 0, so the boundary equals the baseline mean.')}
+    let run=0;
+    for(let s=11;s<=upto;s++){const v=m.get(s);const dep=validNum(v)&&v<out.bound;out.deps[s]=dep;
+      if(dep){run++;if(run>=N&&!out.flag){const seq=[];for(let i=s-N+1;i<=s;i++)seq.push([i,m.get(i)]);out.flag={session:s,seq}}}else run=0}
+  }
+  return out;
+}
+if(typeof module!=='undefined')module.exports={analyze,DATA};
+</script>
+<script>
+const NAMES=Object.keys(DATA);const f2=x=>x==null?'—':x.toFixed(2);
+const st={tab:0,sc:NAMES[0],s:1,play:false,k:2,N:3,timer:null};
+const TABS=['1 Guided demonstration','2 Experiment lab','3 Stress tests','4 Methods & limitations'];
+function nav(){const n=document.getElementById('nav');n.innerHTML='';TABS.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.setAttribute('role','tab');b.setAttribute('aria-selected',i===st.tab);b.onclick=()=>{st.tab=i;pause();render()};n.appendChild(b)})}
+function pause(){st.play=false;clearInterval(st.timer)}
+function chart(a,upto,flagS){
+  const W=760,H=320,L=48,R=12,T=14,B=36,y0=60,y1=100,X=s=>L+(s-1)/29*(W-L-R),Y=v=>T+(y1-Math.max(y0,Math.min(y1,v)))/(y1-y0)*(H-T-B);
+  let g=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Score trajectory with baseline, personal boundary and shared cutoff. Vertical axis starts at 60.">`;
+  for(let v=60;v<=100;v+=10)g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--bd)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}</text>`;
+  for(let s=1;s<=30;s+=(s===1?4:5))g+=`<text x="${X(s)}" y="${H-18}" text-anchor="middle">${s}</text>`;
+  g+=`<text x="${(L+W)/2}" y="${H-3}" text-anchor="middle">Session</text><text x="4" y="12">Score (axis starts at 60)</text>`;
+  g+=`<line x1="${L}" x2="${X(Math.max(upto,1))}" y1="${Y(CUT)}" y2="${Y(CUT)}" stroke="var(--gy)" stroke-width="2" stroke-dasharray="2 4"/>`;
+  if(a.baselineReady){g+=`<line x1="${X(10)}" x2="${X(upto)}" y1="${Y(a.baseline)}" y2="${Y(a.baseline)}" stroke="var(--gn)" stroke-width="2" stroke-dasharray="8 4"/><line x1="${X(10)}" x2="${X(upto)}" y1="${Y(a.bound)}" y2="${Y(a.bound)}" stroke="var(--or)" stroke-width="2" stroke-dasharray="3 3"/>`;
+    g+=`<line x1="${X(10.5)}" x2="${X(10.5)}" y1="${T}" y2="${H-B}" stroke="var(--mu)" stroke-dasharray="1 3"/><text x="${X(10.5)+3}" y="${T+10}">monitoring →</text>`}
+  if(flagS)g+=`<line x1="${X(flagS)}" x2="${X(flagS)}" y1="${T}" y2="${H-B}" stroke="var(--rd)" stroke-width="2"/><text x="${X(flagS)-4}" y="${T+24}" text-anchor="end" style="fill:var(--rd)">first flag: ${flagS}</text>`;
+  const pts=a.rows.filter(r=>validNum(r[1]));g+=`<polyline fill="none" stroke="var(--ac)" stroke-width="2.5" points="${pts.map(r=>X(r[0])+','+Y(r[1])).join(' ')}"/>`;
+  pts.forEach(r=>{const dep=a.deps[r[0]];g+=`<circle cx="${X(r[0])}" cy="${Y(r[1])}" r="${dep?5:3.5}" fill="${dep?'var(--or)':'var(--ac)'}"/>`});
+  return g+'</svg>'}
+const legend=`<p class="sub">Legend: <b style="color:var(--ac)">━ simulated score</b> · <b style="color:var(--gn)">╍ personal baseline</b> · <b style="color:var(--or)">┅ personal lower boundary</b> · <b style="color:var(--gy)">··· illustrative shared cutoff (70)</b> · large orange dots = departures</p>`;
+function page1(){
+  const raw=DATA[st.sc],a=analyze(raw,st.k,st.N,st.s);let msg='';
+  if(st.s<10)msg='Baseline being established.';else if(st.s===10)msg='Baseline established. Monitoring starts at session 11.';
+  const lat=a.latest,below70=lat&&validNum(lat[1])&&lat[1]<CUT;
+  let h=`<div class="card"><div class="row"><label>Scenario <select id="sc">${NAMES.map(n=>`<option ${n===st.sc?'selected':''}>${n}</option>`).join('')}</select></label>
+  <button class="btn" id="pl">${st.play?'Pause':'Play'}</button><button class="btn" id="rs">Reset</button><span>Session <b>${st.s}</b> of 30</span></div>
+  <p><input type="range" id="sl" min="1" max="30" value="${st.s}" aria-label="Session"></p>
+  <p class="sub">Rule in use: boundary = baseline − ${st.k} SD, flag after ${st.N} consecutive departures (defaults 2 and 3; change on page 2).</p>
+  ${msg?`<p><b>${msg}</b></p>`:''}${a.warnings.map(w=>`<p class="r">⚠ ${w}</p>`).join('')}
+  <div class="scroll"><div style="min-width:560px">${chart(a,st.s,a.flag&&a.flag.session)}</div></div>${legend}
+  <p class="sub">Replay uses only sessions 1–${st.s}; nothing later is computed or shown.</p></div>`;
+  h+=`<div class="grid"><div class="card"><h2>Rule 1: illustrative shared cutoff (70)</h2><p>Latest score (session ${lat?lat[0]:'—'}): <b>${lat?lat[1]:'—'}</b></p><p><span class="tag ${below70?'r':'g'}">${below70?'Below 70':'Not below 70'}</span></p><p class="sub">First crossing so far: ${a.crossing??'Not crossed within observed sessions'}</p></div>
+  <div class="card"><h2>Rule 2: personal sustained-change flag</h2>`;
+  if(!a.baselineReady)h+=`<p><span class="tag w">Baseline not yet established</span></p>`;
+  else{h+=`<p>Baseline ${f2(a.baseline)} · sample SD ${f2(a.sd)} · boundary ${f2(a.bound)}</p>`;
+    if(a.flag){h+=`<p><span class="tag r">Flag occurred (first at session ${a.flag.session})</span></p><p>First triggering sequence: ${a.flag.seq.map(r=>'session '+r[0]+' = '+r[1]).join(', ')}. Each score was strictly below ${f2(a.bound)}, ${st.N} in a row.</p>
+      <p>Latest score currently: <span class="tag ${a.deps[lat[0]]?'r':'g'}">${a.deps[lat[0]]?'still below boundary':'not below boundary'}</span></p><p class="sub">The first flag is retained even after scores recover.</p>`}
+    else h+=`<p><span class="tag g">No flag so far</span></p><p class="sub">Needs ${st.N} consecutive scores strictly below ${f2(a.bound)} starting at session 11 or later.</p>`}
+  h+=`</div></div><div class="card"><details><summary>Raw data (sessions revealed so far)</summary><div class="scroll"><table><tr><th>Session</th><th>Score</th><th>Below boundary?</th><th>Below 70?</th></tr>${a.rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[0]<=10?'baseline':(a.deps[r[0]]?'Yes':'No')}</td><td>${r[1]<CUT?'Yes':'No'}</td></tr>`).join('')}</table></div></details></div>`;
+  return h}
+function bind1(){
+  const $=i=>document.getElementById(i);
+  $('sc').onchange=e=>{pause();st.sc=e.target.value;st.s=1;render()};
+  $('sl').oninput=e=>{pause();st.s=+e.target.value;render()};
+  $('rs').onclick=()=>{pause();st.s=1;render()};
+  $('pl').onclick=()=>{if(st.play){pause();render();return}if(st.s>=30)st.s=1;st.play=true;st.timer=setInterval(()=>{if(st.s>=30){pause()}else st.s++;render()},700);render()}}
+function lab(k,N){return NAMES.map(n=>({scenario:n,a:analyze(DATA[n],k,N,30)}))}
+function page2(){
+  const res=lab(st.k,st.N);
+  let h=`<div class="card"><h2>Experiment lab — full-data evaluation (all 30 sessions, not a time-limited replay)</h2><div class="row">
+  <label>Boundary width k <select id="k">${[1,2,3].map(v=>`<option ${v===st.k?'selected':''}>${v}</option>`).join('')}</select> SD</label>
+  <label>Consecutive departures N <input type="number" id="n" min="1" max="5" step="1" value="${st.N}" style="width:70px"></label><button class="btn" id="def">Reset to defaults (k=2, N=3)</button></div></div>
+  <div class="card scroll"><table><tr><th>Scenario</th><th>Boundary</th><th>Personal flag occurred?</th><th>First personal-rule flag session</th><th>First shared-cutoff (&lt;70) crossing</th></tr>
+  ${res.map(r=>`<tr><td>${r.scenario}</td><td>${f2(r.a.bound)}</td><td>${r.a.flag?'Yes':'No flag'}</td><td>${r.a.flag?r.a.flag.session:'No flag'}</td><td>${r.a.crossing??'Not crossed within observed sessions'}</td></tr>`).join('')}</table></div>
+  <div class="card"><p><b>These examples were constructed to illustrate patterns. Success on them is not independent validation.</b></p>
+  <p class="sub">Try k=1 with N=1 or 2 on the Stable scenario to see the sensitivity tradeoff, and N=3 on Temporary Dip versus N=2.</p></div>`;
+  const exp={note:'Synthetic data. Experimental thresholds. Not clinical evidence.',settings:{k:st.k,N:st.N,sharedCutoff:CUT,baselineSessions:'1-10',sdType:'sample (n-1)',evaluated:'full 30 sessions'},results:res.map(r=>({scenario:r.scenario,baselineMean:r.a.baseline,sampleSD:r.a.sd,boundary:r.a.bound,firstPersonalFlag:r.a.flag?r.a.flag.session:null,firstSharedCrossing:r.a.crossing}))};
+  window.__exp=exp;return h+`<div class="card"><h2>Results and settings</h2><p><button class="btn" id="dl" hidden>Download results (JSON)</button> <span class="sub" id="dls">Or copy the text below.</span></p><textarea readonly aria-label="Results JSON">${JSON.stringify(exp,null,2)}</textarea></div>`}
+function bind2(){document.getElementById('k').onchange=e=>{st.k=+e.target.value;render()};
+  document.getElementById('n').onchange=e=>{let v=Math.round(+e.target.value);st.N=Math.min(5,Math.max(1,isFinite(v)?v:3));render()};
+  document.getElementById('def').onclick=()=>{st.k=2;st.N=3;render()}}
+/*SIM*/
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r())}
+const TYPES=[['stable','Stable (noise only)'],['shift','Sustained step shift (target)'],['gradual','Gradual decline (target)'],['dip','Temporary disruption']];
+function genRun(type,p,r){const rows=[];let clipped=0;for(let s=1;s<=30;s++){let v=p.base+p.noise*gauss(r);
+ if(type==='shift'&&s>=p.onset)v-=p.mag;
+ if(type==='gradual'&&s>=p.onset)v-=p.mag*(s-p.onset+1)/(30-p.onset+1);
+ if(type==='dip'&&s>=p.onset&&s<p.onset+p.dur)v-=p.mag;
+ if(v<0){v=0;clipped++}else if(v>100){v=100;clipped++}rows.push([s,v])}return{rows,clipped}}
+function genSet(seed,p){const o={};TYPES.forEach(([t],i)=>{const r=mulberry((seed>>>0)+i*1000003);o[t]=[];for(let j=0;j<p.runs;j++)o[t].push(genRun(t,p,r))});return o}
+function evalSet(set,p,k,N){const res={};for(const [t] of TYPES){const R=set[t];const o={n:R.length,skipped:0,clipped:0,flagged:0,pre:0,post:0,none:0,delays:[]};
+ for(const run of R){o.clipped+=run.clipped;const a=analyze(run.rows,k,N,30);if(!a.baselineReady||a.degenerate){o.skipped++;continue}
+  const ev=[];let c=0;for(let s=11;s<=30;s++){if(a.deps[s]){c++;if(c===N)ev.push(s)}else c=0}
+  if(ev.length)o.flagged++;
+  if(t==='shift'||t==='gradual'){if(ev.some(s=>s<p.onset))o.pre++;const post=ev.find(s=>s>=p.onset);if(post===undefined)o.none++;else{o.post++;o.delays.push(post-p.onset)}}}
+ o.evaluated=o.n-o.skipped;res[t]=o}return res}
+/*ENDSIM*/
+const sim={seed:1,noise:2,mag:8,dur:2,onset:16,runs:20,testSeed:null,frozen:null};
+const simP=()=>({base:90,noise:sim.noise,mag:sim.mag,dur:sim.dur,onset:sim.onset,runs:sim.runs});
+const med=a=>{if(!a.length)return '—';const s=a.slice().sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+function simTable(res){return `<div class="scroll"><table><tr><th>Scenario type</th><th>Runs evaluated</th><th>Outcome (kept separate)</th></tr>${TYPES.map(([t,l])=>{const o=res[t];let x;
+ if(t==='shift'||t==='gradual')x=`<ul class="outc"><li>Flag before onset: ${o.pre}</li><li>First flag at/after onset: ${o.post}</li><li>No post-onset flag within observation: ${o.none}</li><li>Median detection delay after onset: ${med(o.delays)} sessions (post-onset detections only)</li></ul>`;
+ else x=`<ul class="outc"><li>Runs with at least one flag (non-target alert in this experiment): ${o.flagged} of ${o.evaluated} (${o.evaluated?(100*o.flagged/o.evaluated).toFixed(0):'—'}%)</li></ul>`;
+ return `<tr><td>${l}</td><td>${o.evaluated} of ${o.n}${o.skipped?` (${o.skipped} skipped: degenerate baseline)`:''}</td><td>${x}${o.clipped?` <span class="w">· ${o.clipped} scores clipped to 0–100</span>`:''}</td></tr>`}).join('')}</table></div>`}
+function simCharts(set,p){const W=300,H=170,L=30,R=8,T=14,B=22,X=s=>L+(s-1)/29*(W-L-R),Y=v=>T+(100-v)/100*(H-T-B);
+ return `<div class="grid">${TYPES.map(([t,l])=>{const run=set[t][0],a=analyze(run.rows,st.k,st.N,30);let g=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${l}: first simulated run, 0 to 100 scale">`;
+ [0,50,100].forEach(v=>g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--bd)"/><text x="${L-4}" y="${Y(v)+4}" text-anchor="end">${v}</text>`);
+ g+=`<text x="${L}" y="${H-6}">session 1–30 · axis 0–100</text>`;
+ if(t!=='stable')g+=`<line x1="${X(p.onset)}" x2="${X(p.onset)}" y1="${T}" y2="${H-B}" stroke="var(--mu)" stroke-dasharray="2 3"/><text x="${X(p.onset)+2}" y="${T+8}">onset ${p.onset}</text>`;
+ if(a.baselineReady){g+=`<line x1="${X(10)}" x2="${X(30)}" y1="${Y(a.baseline)}" y2="${Y(a.baseline)}" stroke="var(--gn)" stroke-dasharray="8 4" stroke-width="1.5"/><line x1="${X(10)}" x2="${X(30)}" y1="${Y(a.bound)}" y2="${Y(a.bound)}" stroke="var(--or)" stroke-dasharray="3 3" stroke-width="1.5"/>`;
+  if(a.flag)g+=`<line x1="${X(a.flag.session)}" x2="${X(a.flag.session)}" y1="${T}" y2="${H-B}" stroke="var(--rd)" stroke-width="2"/><text x="${X(a.flag.session)-3}" y="${T+20}" text-anchor="end" style="fill:var(--rd)">first flag ${a.flag.session}</text>`}
+ g+=`<polyline fill="none" stroke="var(--ac)" stroke-width="2" points="${run.rows.map(r=>X(r[0])+','+Y(r[1])).join(' ')}"/></svg>`;
+ return `<div><b>${l}</b>${g}</div>`}).join('')}</div><p class="sub">Blue = score, green dashed = baseline, orange dotted = lower boundary, red line = first flag, grey dashed = planted start. Axis is 0–100 so nothing generated is clipped from view.</p>`}
+function page3(){const p=simP(),set=genSet(sim.seed,p),res=evalSet(set,p,st.k,st.N);
+ const num=(id,l,v,mn,mx,sp)=>`<label>${l} <input type="number" id="${id}" value="${v}" min="${mn}" max="${mx}" step="${sp}" style="width:80px"></label>`;
+ let h=`<div class="card"><h2>Stress tests — synthetic simulation (separate from the spreadsheet scenarios)</h2><p class="sub">Everything here is generated from a seeded random-number generator. The three supplied scenarios are never changed. <b>Simulated target:</b> the planted sustained-decline scenarios. A flag in a stable or temporary-disruption run is a <i>non-target alert for this experiment</i>, not proof that a real alert would be clinically inappropriate.</p>
+ <div class="row">${num('sd','Seed',sim.seed,0,999999999,1)}${num('no','Noise SD (score points)',sim.noise,0.5,6,0.5)}${num('mg','Change magnitude (points)',sim.mag,1,30,1)}${num('du','Disruption duration (sessions)',sim.dur,1,10,1)}${num('on','Change start session',sim.onset,11,29,1)}${num('ru','Runs per type',sim.runs,5,100,5)}</div>
+ <div class="row" style="margin-top:8px"><label>k <select id="sk">${[1,2,3].map(v=>`<option ${v===st.k?'selected':''}>${v}</option>`).join('')}</select></label><label>N <input type="number" id="sn" min="1" max="5" value="${st.N}" style="width:60px"></label><button class="btn" id="sr">Reset simulation settings</button></div>
+ <p class="sub">Changing k or N re-evaluates the <b>same</b> dataset; it never regenerates data. Only changing the seed or data settings does.</p></div>
+ <div class="card"><h2>Exploration dataset (seed ${sim.seed}, rule k=${st.k}, N=${st.N})</h2>${simTable(res)}<h3>First simulated run of each type</h3>${simCharts(set,p)}</div>
+ <div class="card"><h2>Freeze the rule, then test on a separately seeded set</h2><div class="row"><button class="btn" id="fz">Freeze current rule (k=${st.k}, N=${st.N})</button><button class="btn" id="nt">New test set</button></div>`;
+ if(sim.frozen){const f=sim.frozen,tp={...p,...f.p};if(sim.testSeed==null)h+=`<p>Rule frozen: k=${f.k}, N=${f.N}. Press <b>New test set</b> to evaluate it on a separately seeded dataset.</p>`;else{h+=`<p>Frozen rule k=${f.k}, N=${f.N} on test seed <b>${sim.testSeed}</b> (data settings as frozen):</p>${simTable(evalSet(genSet(sim.testSeed,tp),tp,f.k,f.N))}<p class="sub">If you now retune settings after seeing these results, this test set has become part of exploration. Press New test set for another independent simulation check.</p>`}}
+ else h+=`<p class="sub">No rule frozen yet.</p>`;
+ h+=`</div><div class="card"><details><summary>Methods: equations, units, assumptions</summary><ul><li>Score<sub>t</sub> = 90 + σ·z<sub>t</sub> − effect<sub>t</sub>, with z<sub>t</sub> standard normal (Box–Muller on a Mulberry32 seeded stream). Units: score points on a 0–100 scale; σ = noise SD.</li><li>Stable: effect = 0.</li><li>Step shift: effect = M for t ≥ onset.</li><li>Gradual decline: effect = M·(t − onset + 1)/(30 − onset + 1) for t ≥ onset, reaching M at session 30.</li><li>Temporary disruption: effect = M for onset ≤ t &lt; onset + D, then full recovery.</li><li>Scores are clipped to 0–100 and clipped counts are shown in the table. Clipping is rarely triggered at baseline 90 unless noise is large.</li><li>Assumptions: the baseline level 90 and Gaussian independent noise are my choices, not facts about people; runs with σ-estimated baseline from only 10 sessions are noisy by design.</li><li>An event is the session where a run of consecutive departures first reaches N. “Flag before onset” counts runs with an event before the start session; detection delay uses the first event at or after onset and excludes pre-onset events. A pre-onset departure run that continues past onset is counted as pre-onset.</li><li>Each type uses its own seeded stream (seed + type·1,000,003), so the same seed and settings reproduce the same data.</li><li>No result is tuned to favor the personal rule; tradeoffs between false alerts and delay appear as they are.</li></ul></details></div>`;
+ const exp={note:'Synthetic data. Experimental thresholds. Not clinical evidence.',simulation:{seed:sim.seed,dataSettings:p,rule:{k:st.k,N:st.N},results:res},frozenTest:sim.frozen&&sim.testSeed!=null?{rule:sim.frozen,testSeed:sim.testSeed}:null};
+ window.__exp=exp;return h+`<div class="card"><h2>Results and settings with seed</h2><p><button class="btn" id="dl" hidden>Download results (JSON)</button> <span class="sub" id="dls">Or copy the text below.</span></p><textarea readonly aria-label="Simulation JSON">${JSON.stringify(exp,null,2)}</textarea></div>`}
+function bind3(){const g=i=>document.getElementById(i),n=(id,key,mn,mx)=>{g(id).onchange=e=>{let v=+e.target.value;if(!isFinite(v))v=sim[key];sim[key]=Math.min(mx,Math.max(mn,key==='noise'||key==='mag'?v:Math.round(v)));render()}};
+ n('sd','seed',0,999999999);n('no','noise',0.5,6);n('mg','mag',1,30);n('du','dur',1,10);n('on','onset',11,29);n('ru','runs',5,100);
+ g('sk').onchange=e=>{st.k=+e.target.value;render()};g('sn').onchange=e=>{st.N=Math.min(5,Math.max(1,Math.round(+e.target.value)||3));render()};
+ g('sr').onclick=()=>{Object.assign(sim,{seed:1,noise:2,mag:8,dur:2,onset:16,runs:20,testSeed:null,frozen:null});render()};
+ g('fz').onclick=()=>{sim.frozen={k:st.k,N:st.N,p:{...simP()}};sim.testSeed=null;render()};
+ g('nt').onclick=()=>{if(!sim.frozen)sim.frozen={k:st.k,N:st.N,p:{...simP()}};sim.testSeed=Math.floor(Math.random()*999999999)+1000;render()}}
+function page4(){return `<div class="card"><h2>Connection to the article</h2><ol><li><b>Personal baseline:</b> this prototype estimates typical synthetic task performance (mean of sessions 1–10).</li><li><b>Trajectory monitoring:</b> it follows repeated measurements but does not learn a patient-specific disease-progression model.</li><li><b>Deviation detection:</b> it applies a transparent threshold-and-duration rule.</li></ol>
+  <p class="sub">Rule: baseline = mean of sessions 1–10; variation = sample SD (n−1); boundary = baseline − k·SD; departure = score strictly below the boundary; flag = N consecutive departures starting at session 11; baseline fixed. The 70 cutoff is illustrative, not a medical threshold.</p></div>
+  <div class="card"><h2>Limitations</h2><ul><li>Synthetic scenarios depend on chosen assumptions.</li><li>Repeated departures do not reveal their cause.</li><li>Results do not establish neurological disease detection.</li><li>Simulation performance does not establish clinical usefulness.</li><li>The prototype lacks multimodal measurements and clinical validation.</li><li>More alerts are not automatically better.</li><li>A temporary disruption can trigger the same rule as sustained decline (try N=2 on the Temporary Dip scenario).</li></ul></div>`}
+async function setupDl(){const b=document.getElementById('dl');if(!b)return;let d=null;try{d=window.claude&&await window.claude.use('downloads')}catch(e){}
+ if(!d)return;b.hidden=false;const tab=st.tab;b.onclick=async()=>{const s=document.getElementById('dls');try{await d.save({filename:tab===1?'trajectory-lab-experiment.json':'trajectory-lab-stress-test.json',data:JSON.stringify(window.__exp,null,2)});s.textContent='Saved.'}catch(e){s.textContent=e&&e.code==='declined'?'Download cancelled.':'Download unavailable here; copy the text below.'}}}
+function render(){nav();const m=document.getElementById('main');m.innerHTML=[page1,page2,page3,page4][st.tab]();if(st.tab===0)bind1();if(st.tab===1)bind2();if(st.tab===2)bind3();setupDl()}
+render();
+</script></body></html>
